@@ -207,12 +207,12 @@ function AuthWrapper() {
 
   const login = async ({ username, password, remember }) => {
     try {
-      const res = await fetch("http://localhost:3001/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: 'include',
-        body: JSON.stringify({ username, password }),
-      });
+      const res = await fetch('/api/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify(payload)
+})
       if (!res.ok) {
         // If backend unavailable (e.g., network error), treat as offline demo
         if (res.status >= 500) {
