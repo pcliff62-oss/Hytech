@@ -1,0 +1,48 @@
+Auth server running on http://localhost:3001
+{"level":"info","message":"::ffff:127.0.0.1 - - [04/Sep/2025:16:19:47 +0000] \"POST /api/export/email HTTP/1.1\" 200 11 \"-\" \"curl/7.79.1\"","timestamp":"2025-09-04T16:19:47.458Z"}
+/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:809
+            err = new Error(message);
+                  ^
+
+Error: Can't send mail - all recipients were rejected: 556-Requested action not taken: domain does not accept mail
+556 invalid DNS MX or A/AAAA resource record 0LxQMu-1uNd6c0Ji6-011fv1
+    at SMTPConnection._formatError (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)
+    at SMTPConnection._actionRCPT (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:1678:28)
+    at SMTPConnection.<anonymous> (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:1639:26)
+    at SMTPConnection._processResponse (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:993:20)
+    at SMTPConnection._onData (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:774:14)
+    at SMTPConnection._onSocketData (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:195:44)
+    at TLSSocket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5) {
+  code: 'EENVELOPE',
+  response: '556-Requested action not taken: domain does not accept mail\n' +
+    '556 invalid DNS MX or A/AAAA resource record 0LxQMu-1uNd6c0Ji6-011fv1',
+  responseCode: 556,
+  command: 'RCPT TO',
+  rejected: [ 'test@example.com' ],
+  rejectedErrors: [
+    Error: Recipient command failed: 556-Requested action not taken: domain does not accept mail
+    556 invalid DNS MX or A/AAAA resource record 0LxQMu-1uNd6c0Ji6-011fv1
+        at SMTPConnection._formatError (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)
+        at SMTPConnection._actionRCPT (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:1664:24)
+        at SMTPConnection.<anonymous> (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:1639:26)
+        at SMTPConnection._processResponse (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:993:20)
+        at SMTPConnection._onData (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:774:14)
+        at SMTPConnection._onSocketData (/Users/patrickclifford/Desktop/COI, W9, Insurance, License,/Business Docs/App Development/Launched version App/server/node_modules/nodemailer/lib/smtp-connection/index.js:195:44)
+        at TLSSocket.emit (node:events:518:28)
+        at addChunk (node:internal/streams/readable:561:12)
+        at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+        at Readable.push (node:internal/streams/readable:392:5) {
+      code: 'EENVELOPE',
+      response: '556-Requested action not taken: domain does not accept mail\n' +
+        '556 invalid DNS MX or A/AAAA resource record 0LxQMu-1uNd6c0Ji6-011fv1',
+      responseCode: 556,
+      command: 'RCPT TO',
+      recipient: 'test@example.com'
+    }
+  ]
+}
+
+Node.js v22.18.0
