@@ -50,7 +50,21 @@ function useLocalStorage(key, initial) {
   const [state, setState] = useState(() => {
     try {
       const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : initial;
+      if (!raw) return initial;
+      const parsed = JSON.parse(raw);
+      // Migration: some users may have an old default company name persisted in localStorage.
+      // If the stored hytech_company has the legacy name, normalize it to an empty name so the header doesn't show it.
+      if (key === "hytech_company" && parsed && typeof parsed.name === "string") {
+        const legacy = parsed.name.trim();
+        if (legacy === "HyTech Roofing Solutions") {
+          const migrated = { ...parsed, name: "" };
+          try {
+            localStorage.setItem(key, JSON.stringify(migrated));
+          } catch {}
+          return migrated;
+        }
+      }
+      return parsed;
     } catch {
       return initial;
     }
@@ -1923,7 +1937,7 @@ Object.assign(data, {
   };
 
   const [company, setCompany] = useLocalStorage("hytech_company", {
-    name: "HyTech Roofing Solutions",
+    name: "",
     address: "714A Route 6-A, Yarmouth Port, MA 02675",
     phone: "",
     email: "",
