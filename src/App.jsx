@@ -1923,7 +1923,7 @@ Object.assign(data, {
   };
 
   const [company, setCompany] = useLocalStorage("hytech_company", {
-    name: "HyTech Roofing Solutions",
+    name: "",
     address: "714A Route 6-A, Yarmouth Port, MA 02675",
     phone: "",
     email: "",
