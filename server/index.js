@@ -23,9 +23,20 @@ app.use(helmet());
 // Allow larger JSON payloads for base64-encoded DOCX exports (default is too small for full documents)
 app.use(express.json({ limit: '20mb' }));
 app.use(cookieParser());
-// Allow dev frontend origin and credentials
+// Allow dev frontend origin and credentials; allow extra live origins via CORS_ORIGINS env var
+const extraOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5177', 'http://localhost:5178'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5177',
+    'http://localhost:5178',
+    ...extraOrigins
+  ],
   credentials: true
 }));
 
@@ -314,7 +325,8 @@ app.post('/api/auth/register',
   // send verification email (development: print token to console)
   try {
     const verifyToken = jwt.sign({ sub: user.id, username }, process.env.ACCESS_TOKEN_SECRET || 'dev_access_secret_change_me', { expiresIn: process.env.EMAIL_VERIFY_EXP || '1d' });
-  const verifyUrl = `http://localhost:3001/api/auth/verify-email?token=${verifyToken}`;
+    const PUBLIC_BACKEND_URL = process.env.PUBLIC_BACKEND_URL || `http://localhost:${process.env.PORT || 3001}`;
+    const verifyUrl = `${PUBLIC_BACKEND_URL}/api/auth/verify-email?token=${verifyToken}`;
     await emails.sendVerificationEmail(username, verifyUrl, username);
   } catch (e) { console.warn('Failed to send verification email', e); }
 
