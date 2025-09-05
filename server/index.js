@@ -11,7 +11,10 @@ const { body, validationResult } = require('express-validator');
 const validatorLib = require('validator');
 const nodemailer = require('nodemailer');
 const zxcvbn = require('zxcvbn');
-const fetch = require('node-fetch');
+// Use global fetch when running on Node 18+. If unavailable, fail with a clear message.
+const fetch = (typeof globalThis !== 'undefined' && typeof globalThis.fetch === 'function')
+  ? globalThis.fetch.bind(globalThis)
+  : (..._args) => { throw new Error('Global fetch is not available. Please run on Node 18+ or install a compatible fetch polyfill.'); };
 const helmet = require('helmet');
 const emails = require('./emails');
 const alerts = require('./alerts');
@@ -374,9 +377,10 @@ app.get('/api/auth/verify-email', async (req, res) => {
     await insertRefreshToken({ jti, user_id: payload.sub, token: refreshToken, issuedAt: now, expiresAt, ip: req.ip, ua: req.get('User-Agent') });
     setRefreshCookie(res, refreshToken, REFRESH_TOKEN_EXP_SECONDS);
 
-    // redirect back to frontend; include verified flag so frontend can exchange refresh cookie for access token
-    const redirectBase = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
-    return res.redirect(`${redirectBase}/?verified=1`);
+  // redirect back to frontend; include verified flag so frontend can exchange refresh cookie for access token
+  // Default to the production frontend on Vercel; allow override via FRONTEND_ORIGIN env var.
+  const redirectBase = process.env.FRONTEND_ORIGIN || 'https://hytech-nine.vercel.app';
+  return res.redirect(`${redirectBase}/?verified=1`);
   } catch (e) {
     console.error('Email verification: Invalid or expired token', e);
     return res.status(400).json({ error: 'Invalid or expired token' });
