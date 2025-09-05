@@ -137,7 +137,7 @@ function AuthWrapper() {
       const justVerified = params.get('verified') === '1';
       if (justVerified) {
         try {
-          const resp = await fetch(`${API}/api/auth/refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ refreshToken: tokens?.refreshToken }) });
+            const resp = await fetch(`${API}/api/auth/refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ refreshToken: tokens?.refreshToken }) });
           if (resp.ok) {
             const data = await resp.json();
             // Attempt to populate username: prefer existing tokens, else decode access token JWT
@@ -165,7 +165,7 @@ function AuthWrapper() {
         return;
       }
       try {
-        const res = await fetch(`${API}/api/auth/refresh", {
+        const res = await fetch(`${API}/api/auth/refresh`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: 'include',
@@ -212,12 +212,12 @@ function AuthWrapper() {
 
   const login = async ({ username, password, remember }) => {
     try {
-      const res = await fetch(`${API}/api/auth/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  credentials: 'include',
-  body: JSON.stringify(payload)
-})
+        const res = await fetch(`${API}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ username, password, remember }),
+        });
       if (!res.ok) {
         // If backend unavailable (e.g., network error), treat as offline demo
         if (res.status >= 500) {
@@ -247,7 +247,7 @@ function AuthWrapper() {
   const logout = async () => {
     try {
       if (tokens?.accessToken) {
-        await fetch(`${API}/api/auth/logout", {
+          await fetch(`${API}/api/auth/logout`, {
           method: "POST",
           credentials: 'include',
           headers: { Authorization: `Bearer ${tokens.accessToken}` },
@@ -265,7 +265,7 @@ function AuthWrapper() {
     if (cur && cur.expiresAt && Date.now() > cur.expiresAt - 30000) {
       // token almost expired — refresh
       try {
-        const r = await fetch(`${API}/api/auth/refresh", {
+          const r = await fetch(`${API}/api/auth/refresh`, {
           method: "POST",
           credentials: 'include',
           headers: { "Content-Type": "application/json" },
@@ -334,7 +334,7 @@ function Login({ onLogin }) {
       if (password !== confirmPassword) return setError("Passwords do not match");
       setLoading(true);
       try {
-        const r = await fetch(`${API}/api/auth/register", {
+        const r = await fetch(`${API}/api/auth/register`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ username: email, password })
         });
         if (!r.ok) {
