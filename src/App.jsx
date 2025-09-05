@@ -2012,6 +2012,49 @@ Object.assign(data, {
     }
   }, [customer.street]);
 
+  // Device Contact Picker integration (uses navigator.contacts.select when available)
+  async function pickDeviceContact() {
+    if (typeof navigator !== 'undefined' && navigator.contacts && navigator.contacts.select) {
+      try {
+        // Request common fields; user will pick one contact
+        const props = ['name', 'tel', 'email', 'address'];
+        const opts = { multiple: false };
+        const results = await navigator.contacts.select(props, opts);
+        if (!results || results.length === 0) {
+          showToast && showToast('No contact selected');
+          return;
+        }
+        const c = results[0] || {};
+        const name = Array.isArray(c.name) ? (c.name[0] || '') : (c.name || '');
+        const tel = Array.isArray(c.tel) ? (c.tel[0] || '') : (c.tel || '');
+        const email = Array.isArray(c.email) ? (c.email[0] || '') : (c.email || '');
+        let street = '', city = '', state = '', zip = '';
+        if (c.address && c.address.length > 0) {
+          const a = c.address[0];
+          if (typeof a === 'string') {
+            const parts = a.split(',').map(p => p.trim()).filter(Boolean);
+            street = parts[0] || '';
+            city = parts[1] || '';
+            const tail = parts[2] || '';
+            const m = tail.match(/([A-Za-z]{2})\s*(\d{5}(?:-\d{4})?)/);
+            if (m) { state = m[1]; zip = m[2]; }
+          } else if (typeof a === 'object') {
+            street = (a.street || a.streetAddress || '') + '';
+            city = a.city || a.locality || '';
+            state = a.region || a.state || '';
+            zip = a.postcode || a.postalCode || a.zip || '';
+          }
+        }
+        setCustomer(prev => ({ ...prev, name, tel, cell: tel, email, street, city, state, zip }));
+        showToast && showToast('Contact imported');
+      } catch (e) {
+        showToast && showToast('Contact picker failed: ' + (e && e.message ? e.message : String(e)));
+      }
+    } else {
+      showToast && showToast('Contact Picker not supported in this browser. Use a compatible browser (Chrome on Android) over HTTPS.');
+    }
+  }
+
   const [measure, setMeasure] = useState({
   roofSquares: 0,
     wastePct: 10,
@@ -2894,13 +2937,53 @@ Object.assign(data, {
             <Card title="Customer Info">
               <TwoCol>
                 <div className="sm:col-span-2">
-                  <TextInput label="Provided On" value={customer.providedOn} onChange={(v) => setCustomer({ ...customer, providedOn: v })} type="date" />
+                  <div className="flex items-center justify-between mb-2">
+                    <TextInput label="Provided On" value={customer.providedOn} onChange={(v) => setCustomer({ ...customer, providedOn: v })} type="date" />
+                  </div>
                 </div>
                 <TextInput label="Customer Name" value={customer.name} onChange={(v) => setCustomer({ ...customer, name: v })} />
                 <TextInput label="Phone" value={customer.tel} onChange={(v) => setCustomer({ ...customer, tel: v })} onBlur={() => setCustomer(c => ({ ...c, tel: fmtPhone(c.tel) }))} />
                 <TextInput label="Mobile" value={customer.cell} onChange={(v) => setCustomer({ ...customer, cell: v })} onBlur={() => setCustomer(c => ({ ...c, cell: fmtPhone(c.cell) }))} />
                 <TextInput label="Email" value={customer.email} onChange={(v) => setCustomer({ ...customer, email: v })} />
-                <TextInput label="Street" value={customer.street} onChange={(v) => setCustomer({ ...customer, street: v })} />
+                {/* Show only street number/name on the Street line; if user pastes full address with commas, parse into fields */}
+                <TextInput
+                  label="Street"
+                  value={(customer.street || '').split(',')[0]}
+                  onChange={(v) => {
+                    try {
+                      const s = (v || '').trim();
+                      if (!s) return setCustomer(prev => ({ ...prev, street: '' , city: '', state: '', zip: '' }));
+                      if (s.includes(',')) {
+                        const parts = s.split(',').map(p => p.trim()).filter(Boolean);
+                        const streetPart = parts[0] || '';
+                        const tail = parts.slice(1).join(', ').trim();
+                        let city = '', state = '', zip = '';
+                        const m = tail.match(/^(.+?)\s+([A-Za-z]{2})\s+(\d{5}(?:-\d{4})?)$/);
+                        if (m) {
+                          city = m[1].trim(); state = m[2].trim(); zip = m[3].trim();
+                        } else {
+                          const tailParts = tail.split(',').map(p => p.trim()).filter(Boolean);
+                          if (tailParts.length === 2) {
+                            city = tailParts[0];
+                            const stZip = (tailParts[1] || '').split(/\s+/).filter(Boolean);
+                            state = stZip[0] || "";
+                            zip = stZip.slice(1).join('') || "";
+                          } else if (parts.length >= 3) {
+                            city = parts[1] || "";
+                            state = parts[2] || "";
+                            zip = parts[3] || "";
+                          } else {
+                            city = tail;
+                          }
+                        }
+                        setCustomer(prev => ({ ...prev, street: streetPart, city, state, zip }));
+                      } else {
+                        // simple edit: clear city/state/zip to avoid them appearing on the street line
+                        setCustomer(prev => ({ ...prev, street: s, city: '', state: '', zip: '' }));
+                      }
+                    } catch (e) { setCustomer(prev => ({ ...prev, street: v })); }
+                  }}
+                />
                 <TextInput label="City" value={customer.city} onChange={(v) => setCustomer({ ...customer, city: v })} />
                 <TextInput label="State" value={customer.state} onChange={(v) => setCustomer({ ...customer, state: v })} />
                 <TextInput label="ZIP" value={customer.zip} onChange={(v) => setCustomer({ ...customer, zip: v })} />
