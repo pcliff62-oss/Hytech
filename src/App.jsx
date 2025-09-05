@@ -2893,8 +2893,10 @@ Object.assign(data, {
           <Section id="customer">
             <Card title="Customer Info">
               <TwoCol>
+                <div className="sm:col-span-2">
+                  <TextInput label="Provided On" value={customer.providedOn} onChange={(v) => setCustomer({ ...customer, providedOn: v })} type="date" />
+                </div>
                 <TextInput label="Customer Name" value={customer.name} onChange={(v) => setCustomer({ ...customer, name: v })} />
-                <TextInput label="Provided On" value={customer.providedOn} onChange={(v) => setCustomer({ ...customer, providedOn: v })} type="date" />
                 <TextInput label="Phone" value={customer.tel} onChange={(v) => setCustomer({ ...customer, tel: v })} onBlur={() => setCustomer(c => ({ ...c, tel: fmtPhone(c.tel) }))} />
                 <TextInput label="Mobile" value={customer.cell} onChange={(v) => setCustomer({ ...customer, cell: v })} onBlur={() => setCustomer(c => ({ ...c, cell: fmtPhone(c.cell) }))} />
                 <TextInput label="Email" value={customer.email} onChange={(v) => setCustomer({ ...customer, email: v })} />
@@ -5181,13 +5183,13 @@ function PrintView({ company, customer, pricing, scope, selectedWork, measure, w
 
       <div className="text-right text-sm">
         <div className="font-medium">Proposal</div>
-        <div>Date: {customer.providedOn}</div>
       </div>
 
   <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
         <div className="rounded border p-2">
           <div className="font-medium">Customer</div>
-          <div>{customer.name}</div>
+          <div className="text-xs text-slate-600">Provided On: {customer.providedOn}</div>
+          <div className="mt-1 font-medium">{customer.name}</div>
           <div>{customer.street}</div>
           <div>
             {customer.city}, {customer.state} {customer.zip}
