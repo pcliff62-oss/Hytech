@@ -1901,7 +1901,7 @@ Object.assign(data, {
   const payload = { to: options.to || (auth && auth.username) || '', subject: `Proposal - ${customer.name || 'Proposal'}`, filename, contentBase64: b64 };
   // Avoid referencing `process` in the browser. Use injected fetchWithAuth when available.
   // Default to local backend during development when no runtime override provided.
-  const apiBase = (typeof window !== 'undefined' && window.__API_BASE) ? window.__API_BASE : 'http://localhost:3001';
+  const apiBase = (typeof window !== 'undefined' && window.__API_BASE) ? window.__API_BASE : 'https://hytech-hi78.onrender.com';
       const apiFetch = (typeof fetchWithAuth === 'function') ? fetchWithAuth : fetch;
       const url = apiBase + '/api/export/email';
       // Don't log the full base64 payload (it can be huge) — log the length and key metadata instead
